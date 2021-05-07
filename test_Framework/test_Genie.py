@@ -1,10 +1,3 @@
-import time
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
-
 from PageObjects.ProductsDetails import ProductDetailsPage
 from test_Framework.BaseClass import BaseClass
 
@@ -24,13 +17,16 @@ class TestGenie(BaseClass):
 
         for product in products:
             plan = product.find_element_by_xpath("div[2]")
+            log.info(plan.text)
             if plan.text == "Kotak Assured Savings Plan":
                 log.info(plan.text)
                 product.find_element_by_xpath("button").click()
                 break
         # Personal details
-        wait = WebDriverWait(self.driver, 10)
-        wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "button[id='insuredSalutation']")))
+        # wait = WebDriverWait(self.driver, 10)
+        # wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "button[id='insuredSalutation']")))
+
+        self.waiting()
         self.driver.find_element_by_css_selector("button[id='insuredSalutation']").click()
 
         salut = self.driver.find_elements_by_css_selector("a[ng-click*='insuredSalutation']")
@@ -66,3 +62,11 @@ class TestGenie(BaseClass):
         self.driver.find_element_by_id("proposerMobileNumber").send_keys("8899009988")
         self.driver.find_element_by_xpath("//button[@translate='Next']").click()
         self.driver.find_element_by_css_selector("button[id= 'pef_yes']").click()
+
+        self.driver.find_element_by_id("premium").send_keys("50000")
+        self.driver.find_element_by_id("floatlabelpolicyTerminyrs").click()
+        policyTerm = self.driver.find_elements_by_css_selector("ul[class ='dropdown-menu kli-dropdown']")
+
+        for pt in policyTerm:
+            pt = self.find_elements_by_css_selector("li a").text
+            print(pt)

@@ -11,3 +11,4 @@ class ProductDetailsPage:
 
     def getProduct(self):
         return self.driver.find_elements(*ProductDetailsPage.product)
+
