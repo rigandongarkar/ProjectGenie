@@ -4,52 +4,48 @@ from selenium import webdriver
 
 def pytest_addoption(parser):
     parser.addoption("--userType", action="store", default="lo302")
+    parser.addoption("--browser", action="store", default="chrome")
 
 
 @pytest.fixture(scope="class")
 def setup(request):
+    browser = request.config.getoption("browser")
     userType = request.config.getoption("userType")
-    chromeOptions = webdriver.ChromeOptions()
-    chromeOptions.add_argument("--start-maximized")
-    driver = webdriver.Chrome(executable_path="E:\\python selenium\\chromedriver_win32\\chromedriver",
-                              options=chromeOptions)
+    if browser == "chrome":
+        chromeOptions = webdriver.ChromeOptions()
+        chromeOptions.add_argument("--start-maximized")
+        chromeOptions.add_argument("--disable-gpu")
+        driver = webdriver.Chrome(executable_path="E:\\python selenium\\chromedriver_win32\\chromedriver",
+                                  options=chromeOptions)
 
-    driver.get("https://genieuat.mykotaklife.com/genie-web/index.html#/login")
-    driver.implicitly_wait(120)
+        driver.get("https://genieuat.mykotaklife.com/genie-web/index.html#/login")
+        # driver.maximize_window()
+        driver.implicitly_wait(120)
+        driver.find_element_by_css_selector("button[id='dropdownMenu2']").click()
+        if userType == "apc" or "tied":
+            driver.find_element_by_css_selector("a[domain='Employee']").click()
+            if userType == "tied":
+                driver.find_element_by_css_selector("input[ng-model='username']").send_keys("lo302")
+                driver.find_element_by_css_selector("input[ng-model='password']").send_keys("Genie@1234")
+                driver.find_element_by_css_selector("button[ng-click='login()']").click()
 
-    # login
-    if userType == "apc":
-        driver.find_element_by_xpath("//input[@ng-model='username']").send_keys("lo302")
-        driver.find_element_by_css_selector("input[id='pwd']").send_keys("Genie@1234")
-        driver.find_element_by_id("floatlabelUserType").click()
-        employeeID = driver.find_elements_by_css_selector("span[class*= 'dropdown'] ul li a")
-        for employeeType in employeeID:
-            # print(employeeType.text)
-            if employeeType.text == "KLI Employee":
-                employeeType.click()
-        driver.find_element_by_xpath("//div[@class='form-group']/button[1]").click()
+    if browser == "firefox":
+        firefoxOptions = webdriver.FirefoxOptions()
+        firefoxOptions.add_argument("--start-maximized")
+        firefoxOptions.add_argument("--disable-gpu")
+        driver = webdriver.Chrome(executable_path="E:\\python selenium\\geckodriver-v0.29.1-win64\\geckodriver",
+                                  options=firefoxOptions)
 
-    elif userType == "tied":
-        driver.find_element_by_xpath("//input[@ng-model='username']").send_keys("lo777")
-        driver.find_element_by_css_selector("input[id='pwd']").send_keys("Genie@1234")
-        driver.find_element_by_id("floatlabelUserType").click()
-        employeeID = driver.find_elements_by_css_selector("span[class*= 'dropdown'] ul li a")
-        for employeeType in employeeID:
-            # print(employeeType.text)
-            if employeeType.text == "KLI Employee":
-                employeeType.click()
-        driver.find_element_by_xpath("//div[@class='form-group']/button[1]").click()
-
-    elif userType == "advisor":
-        driver.find_element_by_xpath("//input[@ng-model='username']").send_keys("60106311")
-        driver.find_element_by_css_selector("input[id='pwd']").send_keys("Genie@1234")
-        driver.find_element_by_id("floatlabelUserType").click()
-        employeeID = driver.find_elements_by_css_selector("span[class*= 'dropdown'] ul li a")
-        for employeeType in employeeID:
-            # print(employeeType.text)
-            if employeeType.text == "Advisor":
-                employeeType.click()
-        driver.find_element_by_xpath("//div[@class='form-group']/button[1]").click()
+        driver.get("https://genieuat.mykotaklife.com/genie-web/index.html#/login")
+        driver.maximize_window()
+        driver.implicitly_wait(30)
+        driver.find_element_by_css_selector("button[id='dropdownMenu2']").click()
+        if userType == "apc" or "tied":
+            driver.find_element_by_css_selector("a[domain='Employee']").click()
+            if userType == "tied":
+                driver.find_element_by_css_selector("input[ng-model='username']").send_keys("lo302")
+                driver.find_element_by_css_selector("input[ng-model='password']").send_keys("Genie@1234")
+                driver.find_element_by_css_selector("button[ng-click='login()']").click()
 
     request.cls.driver = driver
     yield
